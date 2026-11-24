@@ -18,7 +18,8 @@ Toggle off -> unchanged split layout re-applied       // fullscreen.toggle
 Option+/  -> leaves the mode AND flips the root axis   // fullscreen.exit-via-axis
 
 Choose which window shows                              // fullscreen.focus
-├── Option+` / ctl focus next -> next tile in stable order, wraps (raises it)
+├── Option+` / ctl focus next -> next tile in stable order, then floats, wraps (raises it)
+├── Option+Shift+` / ctl focus prev -> the same ring, backward
 ├── Option+H/K -> previous tile, Option+L/J -> next tile, no wrap
 │   └── Past either end -> adjacent display, as in split layouts
 ├── Command+`       -> macOS same-app cycle; Spaceman remembers the result

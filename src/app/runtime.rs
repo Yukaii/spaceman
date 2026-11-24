@@ -246,6 +246,7 @@ impl<B: WorkspaceBackend> WorkspaceRuntime<B> {
                 | WorkerAction::WorkspaceBackAndForth
                 | WorkerAction::MoveWorkspaceToDisplay(_)
                 | WorkerAction::CycleFocus
+                | WorkerAction::CycleFocusPrevious
                 | WorkerAction::Focus(_)
                 | WorkerAction::MoveFocused(_)
         ) {
@@ -287,6 +288,7 @@ impl<B: WorkspaceBackend> WorkspaceRuntime<B> {
                 rt.move_app(&bundle_id, workspace, outputs, cancelled)
             }
             WorkerAction::CycleFocus => rt.cycle_focus(outputs, cancelled),
+            WorkerAction::CycleFocusPrevious => rt.cycle_focus_previous(outputs, cancelled),
             WorkerAction::Focus(direction) => rt.focus_relative(direction, outputs, cancelled),
             WorkerAction::Reorder(direction) => rt.reorder_focused(direction, outputs, cancelled),
             WorkerAction::ToggleLayout => rt.toggle_layout(outputs, cancelled),

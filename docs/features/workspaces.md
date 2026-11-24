@@ -131,6 +131,7 @@ with the original frame persisted to `parked-windows.json` first.
 Keyboard (while tiling is enabled)
 ├── Option+<1..0 | A..Z>        -> switch; pressed again on the active workspace -> next tile
 │                                  (wraps, and is how Fullscreen Layout tiles get focus)
+├── Option+` / Option+Shift+`   -> next / previous window on the workspace, floats included
 ├── Option+Shift+<1..0 | A..Z>  -> move focused window
 ├── Option+Tab                  -> back-and-forth (last two workspaces focused, any display)
 └── Option+Shift+Tab            -> move focused workspace to next display

@@ -234,6 +234,12 @@ fn push_defaults(plan: &mut PlanBuilder<'_>, enabled: &[WorkspaceId], base: u32)
             "cycle workspace windows",
         ),
         (
+            LogicalKey::Character('`'),
+            base | SHIFT_KEY,
+            WorkerAction::CycleFocusPrevious,
+            "cycle workspace windows backward",
+        ),
+        (
             LogicalKey::Semantic(SemanticKey::Tab),
             base,
             WorkerAction::WorkspaceBackAndForth,
@@ -298,6 +304,7 @@ fn worker_action(command: &Command) -> WorkerAction {
         Command::MoveWorkspace(target) => WorkerAction::MoveWorkspaceToDisplay(target.clone()),
         Command::Focus(direction) => WorkerAction::Focus(*direction),
         Command::FocusNext => WorkerAction::CycleFocus,
+        Command::FocusPrev => WorkerAction::CycleFocusPrevious,
         Command::MoveDirection(direction) => WorkerAction::Reorder(*direction),
         Command::Layout => WorkerAction::ToggleLayout,
         Command::Fullscreen => WorkerAction::ToggleFullscreenLayout,
@@ -664,6 +671,10 @@ mod tests {
             ),
             ("grow layout", WorkerAction::Resize(ResizeDirection::Grow)),
             ("cycle workspace windows", WorkerAction::CycleFocus),
+            (
+                "cycle workspace windows backward",
+                WorkerAction::CycleFocusPrevious,
+            ),
             ("focus left", WorkerAction::Focus(Direction::Left)),
             ("focus right", WorkerAction::Focus(Direction::Right)),
             ("move window left", WorkerAction::Reorder(Direction::Left)),
@@ -723,11 +734,11 @@ mod tests {
     }
 
     #[test]
-    fn full_plan_contains_all_thirty_six_registrations() {
+    fn full_plan_contains_all_thirty_seven_registrations() {
         let enabled = WorkspaceId::numbered().collect::<Vec<_>>();
         let plan = HotkeyPlan::from_layout(&enabled, &Shortcuts::default(), &layout()).unwrap();
-        assert_eq!(plan.registrations.len(), 36);
-        assert!(plan.registrations.capacity() >= 36);
+        assert_eq!(plan.registrations.len(), 37);
+        assert!(plan.registrations.capacity() >= 37);
         let move_ws = plan
             .registrations
             .iter()

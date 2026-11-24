@@ -109,6 +109,12 @@ pub const LAYOUT_ACTIONS: &[Action] = &[
         "focus next",
         letter(false, '`'),
     ),
+    action(
+        "focus-prev",
+        "Previous window",
+        "focus prev",
+        letter(true, '`'),
+    ),
     action("focus-left", "Focus left", "focus left", letter(false, 'h')),
     action("focus-down", "Focus down", "focus down", letter(false, 'j')),
     action("focus-up", "Focus up", "focus up", letter(false, 'k')),

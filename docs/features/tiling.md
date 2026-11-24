@@ -17,7 +17,8 @@ Automatic tiling                                        // tile.auto
 Focus                                                   // tile.focus
 ├── Option+H/J/K/L / ctl focus <dir> -> nearest tile in that direction, crossing displays
 │   └── In Fullscreen Layout -> previous/next tile in stable order (see fullscreen-layout.md)
-└── Option+` / ctl focus next        -> next tile in stable order, wrapping
+└── Option+` / ctl focus next        -> next window: tiles in stable order, then floats, wrapping
+    └── Option+Shift+` / ctl focus prev -> the same ring, backward
 
 Reorder                                                 // tile.reorder
 ├── Option+Shift+H/J/K/L / ctl move-direction <dir> -> swap/move within the tree

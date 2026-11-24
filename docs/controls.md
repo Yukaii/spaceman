@@ -14,7 +14,8 @@ fails after the old registrations are released, it pauses and reports `Hotkeys u
 | Add `Shift` to a named workspace key | Move the focused window there without switching |
 | `Option+Tab` | Focus the workspace focused before this one, on any display; only a hidden one switches its display |
 | `Option+Shift+Tab` | Move the focused workspace to the next display (wrapping left-to-right) |
-| Option-backtick | Focus the next tiled window, wrapping in stable workspace order |
+| Option-backtick | Focus the next window on the workspace: tiles in stable order, then floating windows, wrapping |
+| Option-Shift-backtick | Focus the previous window in that same order |
 | `Option+H/J/K/L` | Focus the nearest tile left/down/up/right, including across displays |
 | `Option+Shift+H/J/K/L` | Move the focused tile in that direction |
 | `Option+/` | Toggle the active workspace layout's root horizontal/vertical axis |
@@ -48,8 +49,8 @@ tile.
 Fullscreen Layout is a workspace mode: every tiled window receives the full display frame (less any
 `settings.gaps` edge padding, and centered at `settings.single_window_max_width` when set), and the
 focused window is raised above the others. Its menu-bar workspace glyph is filled while the mode is
-active. Option-backtick focuses the next tiled window and wraps
-through the workspace's stable tile order; it provides the same ordering in split layouts. In
+active. Option-backtick focuses the next window and wraps
+through the workspace's stable tile order, then its floating windows; it provides the same ordering in split layouts. In
 Fullscreen Layout, `Option+H`/`Option+K` step to the previous tile and `Option+L`/`Option+J` to the
 next one in that order without wrapping; past either end of the stack they continue to the adjacent
 display, as in a split layout. Leaving the workspace hides its windows back to front, so stacked
@@ -166,6 +167,7 @@ spaceman ctl move 7
 spaceman ctl move-app com.tinyspeck.slackmacgap 6
 spaceman ctl focus left
 spaceman ctl focus next
+spaceman ctl focus prev
 spaceman ctl move-direction right
 spaceman ctl layout
 spaceman ctl fullscreen
@@ -190,7 +192,7 @@ spaceman doctor 24
 ```
 
 Directions are `left`, `down`, `up`, and `right`. `focus next` is Option-backtick,
-`fullscreen` toggles the focused workspace's Fullscreen Layout, like `Option+Shift+F`, and `float`
+`focus prev` is Option-Shift-backtick, `fullscreen` toggles the focused workspace's Fullscreen Layout, like `Option+Shift+F`, and `float`
 toggles the focused window's floating, like `Option+Shift+Space`. `scratchpad toggle` and
 `scratchpad mark` are `Option+\` and `Option+Shift+\`; while `[labs] scratchpad` is off they report
 `Scratchpad is off`. `balance` equalizes the focused tile's immediate

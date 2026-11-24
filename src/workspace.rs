@@ -626,13 +626,17 @@ impl Workspaces {
         self.floating_owners.insert(window, workspace);
     }
 
+    /// The workspace's tiles in stable tile order, then its floats in a stable
+    /// (app instance, window id) order so callers can walk them predictably.
     pub(crate) fn windows(&self, workspace: WorkspaceId) -> Vec<PhysicalWindowId> {
+        let mut floats: Vec<_> = self
+            .floating_entries()
+            .filter(|(_, owner)| *owner == workspace)
+            .map(|(window, _)| window.clone())
+            .collect();
+        floats.sort();
         let mut windows = self.engine(workspace).bound_windows();
-        windows.extend(
-            self.floating_entries()
-                .filter(|(_, owner)| *owner == workspace)
-                .map(|(window, _)| window.clone()),
-        );
+        windows.extend(floats);
         windows
     }
 

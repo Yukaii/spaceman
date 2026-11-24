@@ -158,7 +158,8 @@ Commands:
 | `back-and-forth` | Return to the previous workspace |
 | `move-workspace [next\|prev\|DISPLAY]` | Move the focused workspace to another display |
 | `focus left\|down\|up\|right` | Focus the nearest tile in that direction |
-| `focus next` | Focus the next tiled window in the workspace |
+| `focus next` | Focus the next window in the workspace: tiles in stable order, then floating windows |
+| `focus prev` | Focus the previous window in that same order |
 | `move-direction left\|down\|up\|right` | Move the focused tile in that direction |
 | `layout` | Toggle the active layout's root split axis |
 | `fullscreen` | Toggle Fullscreen Layout |

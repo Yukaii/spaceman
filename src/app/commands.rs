@@ -457,20 +457,40 @@ impl<B: WorkspaceBackend> WorkspaceRuntime<B> {
         outputs: macos::DisplayOutputs,
         cancelled: &AtomicBool,
     ) -> Result<CycleStatus, String> {
+        self.cycle_focus_by(outputs, cancelled, false)
+    }
+
+    pub(super) fn cycle_focus_previous(
+        &mut self,
+        outputs: macos::DisplayOutputs,
+        cancelled: &AtomicBool,
+    ) -> Result<CycleStatus, String> {
+        self.cycle_focus_by(outputs, cancelled, true)
+    }
+
+    /// Steps through the workspace's tiles in stable order, then its floats,
+    /// wrapping either way, so a workspace of floats (or one tile plus floats)
+    /// can still be cycled. Focus outside that ring enters at the first window
+    /// going forward and the last going backward.
+    fn cycle_focus_by(
+        &mut self,
+        outputs: macos::DisplayOutputs,
+        cancelled: &AtomicBool,
+        backward: bool,
+    ) -> Result<CycleStatus, String> {
         let (focused, workspace) = self.focused_owner_workspace(&outputs, cancelled)?;
-        let windows = self.workspaces.engine(workspace).bound_windows();
+        let windows = self.workspaces.windows(workspace);
+        let len = windows.len();
         let target = match windows.iter().position(|window| window == &focused) {
-            Some(_) if windows.len() < 2 => return Ok(self.status(0, &outputs)),
-            Some(index) => windows[(index + 1) % windows.len()].clone(),
-            // A float of this workspace has no place in the tile order (#178):
-            // step onto the remembered tile, or the first one.
-            None => match self
-                .workspaces
-                .preferred_focus(workspace)
-                .filter(|window| windows.contains(window))
-                .or_else(|| windows.first().cloned())
-            {
-                Some(target) => target,
+            Some(_) if len < 2 => return Ok(self.status(0, &outputs)),
+            Some(index) if backward => windows[(index + len - 1) % len].clone(),
+            Some(index) => windows[(index + 1) % len].clone(),
+            None => match if backward {
+                windows.last()
+            } else {
+                windows.first()
+            } {
+                Some(target) => target.clone(),
                 None => return Ok(self.status(0, &outputs)),
             },
         };

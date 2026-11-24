@@ -246,7 +246,8 @@ pub fn is_built_in_chord(chord: Chord, base: Modifiers, named_workspaces: &[Work
             match character {
                 'h' | 'j' | 'k' | 'l' => true,
                 'f' => shift,
-                '/' | '`' | '-' | '=' => !shift,
+                '`' => true,
+                '/' | '-' | '=' => !shift,
                 _ => false,
             }
         }
@@ -273,6 +274,7 @@ pub enum Command {
     MoveWorkspace(DisplayTarget),
     Focus(Direction),
     FocusNext,
+    FocusPrev,
     MoveDirection(Direction),
     Layout,
     Fullscreen,
@@ -282,7 +284,7 @@ pub enum Command {
     Retile,
 }
 
-pub const COMMAND_USAGE: &str = "switch WORKSPACE|move WORKSPACE|back-and-forth|move-workspace [next|prev|DISPLAY]|focus DIR|focus next|move-direction DIR|layout|fullscreen|float|resize shrink|resize grow|balance|retile|none";
+pub const COMMAND_USAGE: &str = "switch WORKSPACE|move WORKSPACE|back-and-forth|move-workspace [next|prev|DISPLAY]|focus DIR|focus next|focus prev|move-direction DIR|layout|fullscreen|float|resize shrink|resize grow|balance|retile|none";
 
 /// `[shortcuts]` as written.
 #[derive(Deserialize)]
@@ -460,6 +462,7 @@ pub fn parse_command(source: &str) -> Result<Option<Command>, String> {
         ["move", workspace] => Command::Move(WorkspaceId::parse(workspace)?),
         ["back-and-forth"] => Command::BackAndForth,
         ["focus", "next"] => Command::FocusNext,
+        ["focus", "prev"] => Command::FocusPrev,
         ["focus", direction] => Command::Focus(direction.parse()?),
         ["move-direction", direction] => Command::MoveDirection(direction.parse()?),
         ["layout"] => Command::Layout,
@@ -502,6 +505,7 @@ impl Command {
             }
             Self::Focus(direction) => format!("focus {direction}"),
             Self::FocusNext => "cycle workspace windows".into(),
+            Self::FocusPrev => "cycle workspace windows backward".into(),
             Self::MoveDirection(direction) => format!("move window {direction}"),
             Self::Layout => "toggle layout".into(),
             Self::Fullscreen => "toggle fullscreen layout".into(),
@@ -591,6 +595,7 @@ mod tests {
             ("move S", Some(Command::Move(s))),
             ("focus left", Some(Command::Focus(Direction::Left))),
             ("focus next", Some(Command::FocusNext)),
+            ("focus prev", Some(Command::FocusPrev)),
             (
                 "move-direction up",
                 Some(Command::MoveDirection(Direction::Up)),
@@ -749,6 +754,7 @@ mod tests {
             "alt+shift+tab",
             "alt+/",
             "alt+`",
+            "alt+shift+`",
             "alt+-",
             "alt+=",
             "alt+a",

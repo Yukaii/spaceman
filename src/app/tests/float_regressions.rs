@@ -1,5 +1,5 @@
 //! Floating-window regressions: rule origin across a restart (#160), focus next
-//! from a float (#178), and a float omitted from one snapshot (#179).
+//! from and through floats (#178), and a float omitted from one snapshot (#179).
 use super::*;
 
 fn act(runtime: &mut WorkspaceRuntime<FakeBackend>, action: WorkerAction) -> Result<(), String> {
@@ -133,7 +133,7 @@ fn tiles_and_focused_float() -> WorkspaceRuntime<FakeBackend> {
     runtime
 }
 
-/// #178: focus next from a workspace-owned float steps onto its tiles.
+/// #178: focus next from a workspace-owned float wraps onto its first tile.
 #[test]
 fn focus_next_from_an_owned_float_focuses_a_tile() {
     let mut runtime = tiles_and_focused_float();
@@ -143,13 +143,6 @@ fn focus_next_from_an_owned_float_focuses_a_tile() {
         runtime.workspaces.floating_workspace_of(&window(30)),
         Some(WorkspaceId::ONE)
     );
-
-    let mut runtime = tiles_and_focused_float();
-    runtime
-        .workspaces
-        .remember_focus(WorkspaceId::ONE, &window(20));
-    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
-    assert_eq!(runtime.backend.focused, Some(window(20)));
 }
 
 /// #178 control: focus next from a tile still walks the tile order.
@@ -159,6 +152,67 @@ fn focus_next_from_a_tile_still_cycles_the_tiles() {
     runtime.backend.focused = Some(window(10));
     act(&mut runtime, WorkerAction::CycleFocus).unwrap();
     assert_eq!(runtime.backend.focused, Some(window(20)));
+}
+
+/// Focus next walks the tiles, then the workspace's floats, then wraps.
+#[test]
+fn focus_next_cycles_tiles_then_floats() {
+    let mut runtime = tiles_and_focused_float();
+    runtime.backend.focused = Some(window(20));
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(30)));
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(10)));
+}
+
+/// One tile plus a float still has somewhere to go.
+#[test]
+fn focus_next_reaches_a_float_beside_a_single_tile() {
+    let mut runtime = floated_second_window();
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(20)));
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(10)));
+}
+
+/// A workspace holding only floats cycles among them.
+#[test]
+fn focus_next_cycles_a_floats_only_workspace() {
+    let mut runtime = floated_second_window();
+    act(&mut runtime, WorkerAction::ToggleFloat).unwrap();
+    assert!(
+        runtime
+            .workspaces
+            .engine(WorkspaceId::ONE)
+            .bound_windows()
+            .is_empty()
+    );
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(20)));
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(10)));
+}
+
+/// Focus prev walks the same ring backward: floats, then tiles in reverse.
+#[test]
+fn focus_prev_walks_the_ring_backward() {
+    let mut runtime = tiles_and_focused_float();
+    runtime.backend.focused = Some(window(10));
+    act(&mut runtime, WorkerAction::CycleFocusPrevious).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(30)));
+    act(&mut runtime, WorkerAction::CycleFocusPrevious).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(20)));
+    act(&mut runtime, WorkerAction::CycleFocusPrevious).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(10)));
+}
+
+/// Next then prev returns to the starting window, floats included.
+#[test]
+fn focus_next_then_prev_returns_to_the_start() {
+    let mut runtime = tiles_and_focused_float();
+    act(&mut runtime, WorkerAction::CycleFocus).unwrap();
+    act(&mut runtime, WorkerAction::CycleFocusPrevious).unwrap();
+    assert_eq!(runtime.backend.focused, Some(window(30)));
 }
 
 fn floated_second_window() -> WorkspaceRuntime<FakeBackend> {
